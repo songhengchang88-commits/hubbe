@@ -51,7 +51,8 @@ VPNGATE_MIRROR = os.environ.get(
     "https://raw.githubusercontent.com/fdciabdul/Vpngate-Scraper-API/main/json/data.json",
 )
 # 已部署的 Cloudflare Worker 检测接口 (GET /check?proxyip=host:port, 实测确认)
-WORKER_CHECK_URL = os.environ.get("CHECK_WORKER", "https://check.helei.kdns.fr/check?sstp=vpn:vpn@")
+WORKER_CHECK_URL = os.environ.get("CHECK_WORKER", "https://
+ch.alaric2026.ccwu.cc/check?sstp=vpn:vpn@")
 CONCURRENCY = max(1, int(os.environ.get("CHECK_CONCURRENCY", "32")))   # 与 Worker 网页端一致的并发模型
 CHECK_TIMEOUT = float(os.environ.get("CHECK_TIMEOUT", "90"))          # 单请求客户端超时 (秒)
 MAX_CHECK_NODES = int(os.environ.get("MAX_CHECK_NODES", "0"))         # 0=不限; 本地测试可设小值
@@ -460,7 +461,7 @@ EDGE_HOSTS = [
     h.strip()
     for h in os.environ.get(
         "EDGE_HOSTS",
-        "saas.072159.xyz:443,hzytjy.cn:443,ali.nonull.pp.ua:443,auto.dolby.dpdns.org:443,"
+        "linear.app:443,constitution.congress.gov:443,www.trumpinternationalrealty.com:443,openai.com:443,securecircle.com:443,store.ubi.com:443,staticdelivery.nexusmods.com:443,chrono24.com:443,www.vmware.com:443,www.carousell.sg:443,www.sloomb.com:443,rocketreach.co:443,liziye.pages.dev:443,uptimerobot.com:443,i.pixiv.re:443,redis.io:443,s.ee:443,garuda-indonesia.com:443,builtbybuffalo.com:443,img.imgdd.com:443,webn.cc:443,www.epicgames.com:443,www.scayle.com:443,icook.hk:443,vegasgeek.com:443,vueframework.com:443,debot.ai:443"
         "cdn.cnno.de:443,saas.sin.fan:443,cf.777791.xyz:443",
     ).split(",")
     if h.strip()
@@ -530,7 +531,7 @@ SUB_URL = os.environ.get("SUB_URL", "https://jerylihub.github.io/gate/sub.txt")
 
 def _b64_secret_encode(plaintext, secret):
     """复刻 edgetunnel 的 base64SecretEncode: UTF-8 循环密钥 XOR + 标准 base64。"""
-    data = plaintext.encode("utf-8")
+    data = plaintext.encode("utf-8")      
     key = secret.encode("utf-8")
     mixed = bytes(data[i] ^ key[i % len(key)] for i in range(len(data)))
     return base64.b64encode(mixed).decode("ascii")
