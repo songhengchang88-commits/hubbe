@@ -40,23 +40,26 @@ jobs:
           CHECK_TIMEOUT: "90"
 
       - name: Ensure GitHub Pages is enabled (one-time auto setup)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          code=$(curl -s -o /dev/null -w '%{http_code}' \
+          code=$(curl -sS -o /tmp/pages.out -w '%{http_code}' \
             -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/pages")
+
           echo "Pages API status: $code"
           if [ "$code" = "404" ]; then
-            echo "首次运行: 启用 GitHub Pages (source = GitHub Actions, 目录 /public)"
-            curl -sS -X PUT \
+            echo "首次运行: 启用 GitHub Pages (GitHub Actions 模式)"
+            curl -sS -X POST \
               -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
               -H "Content-Type: application/json" \
-              -d '{"build_type":"workflow","source":{"branches":["main"],"path":"/public"}}' \
+              -d '{"build_type":"workflow"}' \
               "https://api.github.com/repos/$GITHUB_REPOSITORY/pages"
             echo
             sleep 10
           fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -71,4 +74,8 @@ jobs:
         uses: actions/deploy-pages@v4
 
       - name: Show site URL
-        run: 'echo "site: https://jerylihub.github.io/gate/ (deploy outcome: ${{ steps.deployment.outcome }})"'
+        run: |
+          owner=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f1)
+          repo=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)
+          site="https://${owner}.github.io/${repo}/"
+          echo "site: ${site} (deploy outcome: ${{ steps.deployment.outcome }})"
