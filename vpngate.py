@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 VPN Gate SSTP 节点检测流水线
-============================
+===============================
 流程:
   1. 获取 VPN Gate 原始节点 (官方 api/iphone CSV, 失败时回退 GitHub 预解析镜像)
   2. 只保留「带 TCP 入口」的中继 = SSTP 可用节点
@@ -81,7 +81,7 @@ COUNTRY_ZH = {
     "GB": "英国", "UK": "英国", "SG": "新加坡", "TW": "台湾", "HK": "香港",
     "CN": "中国", "AU": "澳大利亚", "NL": "荷兰", "SE": "瑞典", "CH": "瑞士",
     "IT": "意大利", "ES": "西班牙", "PL": "波兰", "IN": "印度", "BR": "巴西",
-    "MX": "墨西哥", "ID": "印度尼西亚", "MY": "马来西亚", "PH": "��律宾",
+    "MX": "墨西哥", "ID": "印度尼西亚", "MY": "马来西亚", "PH": "菲律宾",
     "TR": "土耳其", "UA": "乌克兰", "CZ": "捷克", "GR": "希腊", "PT": "葡萄牙",
     "FI": "芬兰", "NO": "挪威", "DK": "丹麦", "IE": "爱尔兰", "BE": "比利时",
     "AT": "奥地利", "HU": "匈牙利", "AR": "阿根廷", "CL": "智利", "CO": "哥伦比亚",
@@ -460,8 +460,13 @@ EDGE_HOSTS = [
     h.strip()
     for h in os.environ.get(
         "EDGE_HOSTS",
-        "linear.app:443,constitution.congress.gov:443,www.trumpinternationalrealty.com:443,openai.com:443,securecircle.com:443,store.ubi.com:443,staticdelivery.nexusmods.com:443,chrono24.com:443,[...]
-        "cdn.cnno.de:443,saas.sin.fan:443,cf.777791.xyz:443",
+        (
+            "linear.app:443,constitution.congress.gov:443,"
+            "www.trumpinternationalrealty.com:443,openai.com:443,"
+            "securecircle.com:443,store.ubi.com:443,"
+            "staticdelivery.nexusmods.com:443,chrono24.com:443,"
+            "cdn.cnno.de:443,saas.sin.fan:443,cf.777791.xyz:443"
+        ),
     ).split(",")
     if h.strip()
 ]
