@@ -14,7 +14,7 @@ VPN Gate SSTP 节点检测流水线
 
 退出码:
   0 = 正常完成 (允许部分节点检测失败)
-  1 = 硬性失败 (数据源全挂 / 解析不出 SSTP 节点 / Worker 完全不可达 / 程序异常)
+  1 = 硬性失败 (数据源全挂 / 解析不出 SSTP 节点 / 程序异常)
      这些情况绝不允许"假成功"
 """
 
@@ -81,7 +81,7 @@ COUNTRY_ZH = {
     "GB": "英国", "UK": "英国", "SG": "新加坡", "TW": "台湾", "HK": "香港",
     "CN": "中国", "AU": "澳大利亚", "NL": "荷兰", "SE": "瑞典", "CH": "瑞士",
     "IT": "意大利", "ES": "西班牙", "PL": "波兰", "IN": "印度", "BR": "巴西",
-    "MX": "墨西哥", "ID": "印度尼西亚", "MY": "马来西亚", "PH": "菲律宾",
+    "MX": "墨西哥", "ID": "印度尼西亚", "MY": "马来西亚", "PH": "��律宾",
     "TR": "土耳其", "UA": "乌克兰", "CZ": "捷克", "GR": "希腊", "PT": "葡萄牙",
     "FI": "芬兰", "NO": "挪威", "DK": "丹麦", "IE": "爱尔兰", "BE": "比利时",
     "AT": "奥地利", "HU": "匈牙利", "AR": "阿根廷", "CL": "智利", "CO": "哥伦比亚",
@@ -460,7 +460,7 @@ EDGE_HOSTS = [
     h.strip()
     for h in os.environ.get(
         "EDGE_HOSTS",
-        "linear.app:443,constitution.congress.gov:443,www.trumpinternationalrealty.com:443,openai.com:443,securecircle.com:443,store.ubi.com:443,staticdelivery.nexusmods.com:443,chrono24.com:443,www.vmware.com:443,www.carousell.sg:443,www.sloomb.com:443,rocketreach.co:443,liziye.pages.dev:443,uptimerobot.com:443,i.pixiv.re:443,redis.io:443,s.ee:443,garuda-indonesia.com:443,builtbybuffalo.com:443,img.imgdd.com:443,webn.cc:443,www.epicgames.com:443,www.scayle.com:443,icook.hk:443,vegasgeek.com:443,vueframework.com:443,debot.ai:443"
+        "linear.app:443,constitution.congress.gov:443,www.trumpinternationalrealty.com:443,openai.com:443,securecircle.com:443,store.ubi.com:443,staticdelivery.nexusmods.com:443,chrono24.com:443,[...]
         "cdn.cnno.de:443,saas.sin.fan:443,cf.777791.xyz:443",
     ).split(",")
     if h.strip()
@@ -530,7 +530,7 @@ SUB_URL = os.environ.get("SUB_URL", "https://jerylihub.github.io/gate/sub.txt")
 
 def _b64_secret_encode(plaintext, secret):
     """复刻 edgetunnel 的 base64SecretEncode: UTF-8 循环密钥 XOR + 标准 base64。"""
-    data = plaintext.encode("utf-8")      
+    data = plaintext.encode("utf-8")
     key = secret.encode("utf-8")
     mixed = bytes(data[i] ^ key[i % len(key)] for i in range(len(data)))
     return base64.b64encode(mixed).decode("ascii")
@@ -679,9 +679,20 @@ def main():
     log("CLOUDFLARE WORKER", f"检测失败: {len(failed)}" + (f" (其中 Worker 异常 {len(worker_errors)})" if worker_errors else ""))
     log("CLOUDFLARE WORKER", f"耗时: {elapsed:.1f}s")
 
-    # 硬性失败: Worker 完全不可达 (没有任何一个请求拿到正常响应)
+    # 降级处理：Worker 不可达时记录状态并生成页面，不再把它判定为硬失败
     if uniq and not success and len(worker_errors) == len(uniq):
-        die("Worker 全部请求异常, 检测服务不可用 — 本次运行判定失败 (不生成空结果)")
+        log("CLOUDFLARE WORKER", "Worker 全部请求异常, 进入降级模式: 记录状态并生成占位页面, 不判定为硬失败")
+        data = build_outputs(results, raw_count, sstp_count, source)
+        data["stats"]["worker_unavailable"] = True
+        data["stats"]["warning"] = "worker_unavailable"
+        data_path, html_path, chains_path, hosts_path, sub_path = write_outputs(data)
+        log("WEBSITE", f"生成 {os.path.relpath(data_path, REPO_DIR)}")
+        log("WEBSITE", f"生成 {os.path.relpath(html_path, REPO_DIR)}")
+        log("WEBSITE", f"生成 {os.path.relpath(chains_path, REPO_DIR)}")
+        log("WEBSITE", f"生成 {os.path.relpath(hosts_path, REPO_DIR)}")
+        log("WEBSITE", f"生成 {os.path.relpath(sub_path, REPO_DIR)}")
+        log("WEBSITE", "已进入降级模式 (Worker 全部不可用)")
+        return
 
     # 4) 结果 + 网页
     data = build_outputs(results, raw_count, sstp_count, source)
