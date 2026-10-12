@@ -56,6 +56,16 @@ jobs:
           CHECK_CONCURRENCY: "32"
           CHECK_TIMEOUT: "90"
 
+      - name: Syntax check Python files
+        run: python -m py_compile vpngate.py
+
+      - name: Ensure build output exists
+        run: |
+          if [ ! -d "public" ]; then
+            echo "public/ was not generated; build step failed before artifact upload"
+            exit 1
+          fi
+
       - name: Ensure GitHub Pages is enabled (one-time auto setup)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
