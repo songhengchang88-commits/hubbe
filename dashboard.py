@@ -12,6 +12,8 @@
 
 import os
 import sys
+import re
+import shutil
 import time
 import json
 import glob
@@ -35,12 +37,15 @@ C_TEXT_LIGHT = "#f1f5f9"     # 标题正白
 C_TEXT_MUTED = "#94a3b8"     # 辅助灰白
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "browser_data")
 G_BASE = r"G:\矩阵短视频" if os.path.exists("G:\\") else BASE_DIR
 
 DIR_PENDING = os.path.join(G_BASE, "待切片视频")
 DIR_COMPLETED = os.path.join(G_BASE, "已完成切片")
 DIR_PUBLISHED = os.path.join(G_BASE, "已发布")
 RECORD_FILE = os.path.join(DIR_PUBLISHED, "published_record.json")
+
+os.makedirs(DATA_DIR, exist_ok=True)
 
 os.makedirs(DIR_PENDING, exist_ok=True)
 os.makedirs(DIR_COMPLETED, exist_ok=True)
