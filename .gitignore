@@ -1,0 +1,53 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Browser Profile & Active Sessions (CRITICAL SECURITY: DO NOT COMMIT)
+browser_data/
+*.sqlite
+*.sqlite3
+Cookies
+Cookies-journal
+
+# Temporary Pipeline & Working Directories
+temp_pipeline/
+temp/
+tmp/
+*.tmp
+
+# Media Assets & Generated Large Files
+待切片长视频/
+长视频切片成果/
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.flv
+*.webm
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.pcm
+
+# Logs & Runtime Dumps
+*.log
+*.log.*
+douyin_page_text.txt
+
+# Local System & IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+desktop.ini
+
+# Environment & Credentials
+.env
+.env.local
+*.pem
+*.key
+credentials.json
